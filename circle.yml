@@ -1,7 +1,7 @@
 version: 2
 jobs:
   build:
-    working_directory: ~/ksr
+    working_directory: ~/ksr-maybe
     docker:
       - image: ruby:2.2
     steps:
