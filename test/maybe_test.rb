@@ -1,73 +1,74 @@
-require "test_helper"
+require 'minitest/autorun'
+require 'shoulda/context'
 
-require_relative "../lib/ksr/maybe"
+require_relative "../lib/maybe"
 
-class Ksr::MaybeTest < ActiveSupport::TestCase
+class MaybeTest < Minitest::Test
   context ".Nothing" do
     should "return an instance of Nothing" do
-      assert_equal Ksr::Nothing.instance, Ksr::Maybe.Nothing
+      assert_equal Nothing.instance, Maybe.Nothing
     end
   end
 
   context ".Just" do
     should "return an instance of Just" do
-      assert_equal Ksr::Maybe.of(1), Ksr::Maybe.Just(1)
+      assert_equal Maybe.of(1), Maybe.Just(1)
     end
   end
 
   context ".of" do
     should "return an instance of Just" do
-      assert_equal Ksr::Just.new(1), Ksr::Maybe.of(1)
+      assert_equal Just.new(1), Maybe.of(1)
     end
   end
 
   context ".from_nullable" do
     context "when value is `nil`" do
       should "return an instance of Nothing" do
-        assert_equal Ksr::Nothing.instance, Ksr::Maybe.from_nullable(nil)
+        assert_equal Nothing.instance, Maybe.from_nullable(nil)
       end
     end
 
     context "when value is not `nil`" do
       should "return an instance of Just" do
-        assert_equal Ksr::Maybe.of(1), Ksr::Maybe.from_nullable(1)
+        assert_equal Maybe.of(1), Maybe.from_nullable(1)
       end
     end
   end
 
   context ".zip" do
     setup do
-      @just = Ksr::Maybe.of(1)
-      @nothing = Ksr::Nothing.instance
+      @just = Maybe.of(1)
+      @nothing = Nothing.instance
     end
 
     context "with only Just values" do
       should "return an instance of Just" do
-        assert_equal Ksr::Maybe.of([1,1]), Ksr::Maybe.zip(@just, @just)
+        assert_equal Maybe.of([1,1]), Maybe.zip(@just, @just)
       end
     end
 
     context "with only Nothing values" do
       should "return an instance of Nothing" do
-        assert_equal Ksr::Nothing.instance, Ksr::Maybe.zip(@nothing, @nothing)
+        assert_equal Nothing.instance, Maybe.zip(@nothing, @nothing)
       end
     end
 
     context "with a mixture of Just and Nothing values" do
       should "return an instance of Nothing" do
-        assert_equal Ksr::Nothing.instance, Ksr::Maybe.zip(@just, @nothing, @just)
+        assert_equal Nothing.instance, Maybe.zip(@just, @nothing, @just)
       end
     end
   end
 
   context "Nothing" do
     subject do
-      Ksr::Nothing.instance
+      Nothing.instance
     end
 
     context "#get" do
       should "raise an error" do
-        assert_raise(Ksr::Nothing::NothingError) { subject.get }
+        assert_raises(Nothing::NothingError) { subject.get }
       end
     end
 
@@ -103,20 +104,20 @@ class Ksr::MaybeTest < ActiveSupport::TestCase
 
     context "#ap" do
       should "return self" do
-        assert_equal subject, subject.ap(Ksr::Maybe.of(->(x){ x + 1 }))
+        assert_equal subject, subject.ap(Maybe.of(->(x){ x + 1 }))
       end
     end
 
     context "#==" do
       context "when object is a Nothing" do
         should "return true" do
-          assert_equal subject, Ksr::Nothing.instance
+          assert_equal subject, Nothing.instance
         end
       end
 
       context "when object is a Just" do
         should "return false" do
-          refute_equal subject, Ksr::Maybe.of(1)
+          refute_equal subject, Maybe.of(1)
         end
       end
     end
@@ -130,7 +131,7 @@ class Ksr::MaybeTest < ActiveSupport::TestCase
 
   context "Just" do
     subject do
-      Ksr::Maybe.of(1)
+      Maybe.of(1)
     end
 
     context "#get" do
@@ -174,8 +175,8 @@ class Ksr::MaybeTest < ActiveSupport::TestCase
 
     context "#flat_map" do
       setup do
-        @f = ->(n) { Ksr::Maybe.of(n + 1) }
-        @g = ->(n) { Ksr::Maybe.of(n * 2) }
+        @f = ->(n) { Maybe.of(n + 1) }
+        @g = ->(n) { Maybe.of(n * 2) }
       end
 
       should "fail if the function does not rewrap the value" do
@@ -187,7 +188,7 @@ class Ksr::MaybeTest < ActiveSupport::TestCase
       end
 
       should "be equivalent when the function merely rewraps" do
-        assert_equal subject, subject.flat_map(&Ksr::Maybe.method(:of))
+        assert_equal subject, subject.flat_map(&Maybe.method(:of))
       end
 
       should "hold to the law of associativity" do
@@ -203,45 +204,45 @@ class Ksr::MaybeTest < ActiveSupport::TestCase
       end
 
       should "raise if argument is not an instance of Maybe" do
-        assert_raises(ContractError) { Ksr::Maybe.of(1).ap(->(x){ x + 1 }) }
+        assert_raises(ContractError) { Maybe.of(1).ap(->(x){ x + 1 }) }
       end
 
       should "raise if argument is not a Maybe holding a function" do
-        assert_raises(ContractError) { Ksr::Maybe.of(1).ap(Ksr::Maybe.of(1)) }
+        assert_raises(ContractError) { Maybe.of(1).ap(Maybe.of(1)) }
       end
 
       should "work when given a Maybe holding a function" do
-        assert_equal Ksr::Maybe.of("HELLO, WORLD!"), Ksr::Maybe.of("hello, world!").ap(Ksr::Maybe.of(@upcase))
+        assert_equal Maybe.of("HELLO, WORLD!"), Maybe.of("hello, world!").ap(Maybe.of(@upcase))
       end
 
       should "hold to the law of identity" do
-        assert_equal Ksr::Maybe.of(1), Ksr::Maybe.of(1).ap(Ksr::Maybe.of(@identity))
+        assert_equal Maybe.of(1), Maybe.of(1).ap(Maybe.of(@identity))
       end
     end
 
     context "#==" do
       context "when object is a Just that is equivalent" do
         should "return true" do
-          assert_equal Ksr::Maybe.of(1), Ksr::Maybe.of(1)
+          assert_equal Maybe.of(1), Maybe.of(1)
         end
       end
 
       context "when object is a Just that is equivalent" do
         should "return false" do
-          refute_equal Ksr::Maybe.of(1), Ksr::Maybe.of(2)
+          refute_equal Maybe.of(1), Maybe.of(2)
         end
       end
 
       context "when object is a Nothing" do
         should "return false" do
-          refute_equal Ksr::Nothing.instance, Ksr::Maybe.of(1)
+          refute_equal Nothing.instance, Maybe.of(1)
         end
       end
     end
 
     context "#inspect" do
       should "return the correct String" do
-        assert_equal "Just(1)", Ksr::Maybe.of(1).inspect
+        assert_equal "Just(1)", Maybe.of(1).inspect
       end
     end
   end
