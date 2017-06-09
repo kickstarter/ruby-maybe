@@ -1,0 +1,10 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/ksr
+    docker:
+      - image: ruby:2.2
+    steps:
+      - checkout
+      - run: bundle install
+      - run: bundle exec rake test
