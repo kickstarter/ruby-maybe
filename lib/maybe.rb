@@ -20,7 +20,6 @@ Just = Class.new
 # useful for gracefully handling potentially null values:
 #
 # @example when value is non-null
-#
 #   User.create!(email: "john@doe.com", name: "John Doe")
 #
 #   Maybe
@@ -31,7 +30,6 @@ Just = Class.new
 #   #=> "John Doe"
 #
 # @example when value is null
-#
 #   Maybe
 #     .from_nullable(User.find_by(email: "not@present.com"))
 #     .map {|user| user.name }
@@ -42,7 +40,7 @@ Just = Class.new
 module Maybe
   include Contracts::Core
   C = Contracts
-  private_constant C
+  private_constant :C
 
   # An alias for instantiating a Nothing object
   #
@@ -146,7 +144,7 @@ class Nothing
   include Maybe
   include Contracts::Core
   C = Contracts
-  private_constant C
+  private_constant :C
 
   NothingError = Class.new(RuntimeError)
 
@@ -285,7 +283,7 @@ class Just
   include Maybe
   include Contracts::Core
   C = Contracts
-  private_constant C
+  private_constant :C
 
   def initialize(value)
     @value = value
