@@ -42,6 +42,7 @@ Just = Class.new
 module Maybe
   include Contracts::Core
   C = Contracts
+  private_constant C
 
   # An alias for instantiating a Nothing object
   #
@@ -145,6 +146,7 @@ class Nothing
   include Maybe
   include Contracts::Core
   C = Contracts
+  private_constant C
 
   NothingError = Class.new(RuntimeError)
 
@@ -283,6 +285,7 @@ class Just
   include Maybe
   include Contracts::Core
   C = Contracts
+  private_constant C
 
   def initialize(value)
     @value = value
