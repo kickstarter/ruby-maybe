@@ -104,7 +104,7 @@ class MaybeTest < Minitest::Test
 
     context "#ap" do
       should "return self" do
-        assert_equal subject, subject.ap(Maybe.of(->(x){ x + 1 }))
+        assert_equal subject, subject.ap(Maybe.of(1))
       end
     end
 
@@ -197,26 +197,32 @@ class MaybeTest < Minitest::Test
     end
 
     context "#ap" do
-      setup do
-        @identity = ->(x){ x }
-        @upcase = ->(str){ str.upcase }
-        @add = ->(n){ n + 1 }
-      end
-
-      should "raise if argument is not an instance of Maybe" do
-        assert_raises(ContractError) { Maybe.of(1).ap(->(x){ x + 1 }) }
-      end
-
-      should "raise if argument is not a Maybe holding a function" do
-        assert_raises(ContractError) { Maybe.of(1).ap(Maybe.of(1)) }
-      end
-
-      should "work when given a Maybe holding a function" do
-        assert_equal Maybe.of("HELLO, WORLD!"), Maybe.of("hello, world!").ap(Maybe.of(@upcase))
+      should "raise if called on a non-callable self" do
+        assert_raises(StandardError) do
+          Maybe.of(1).ap(Maybe.of(1))
+        end
       end
 
       should "hold to the law of identity" do
-        assert_equal Maybe.of(1), Maybe.of(1).ap(Maybe.of(@identity))
+        assert_equal(
+          Maybe.of(1),
+          Maybe.of(->(x) { x }).ap(Maybe.of(1))
+        )
+      end
+
+      should "contain proc if insuffucient args" do
+        assert(
+          Maybe.of(->(x, y) { })
+            .ap(Maybe.of(1))
+            .get
+            .is_a?(Proc)
+        )
+      end
+
+      should "raise if argument is not an instance of Maybe" do
+        assert_raises(ContractError) do
+          Maybe.of(->(x, y) { }).ap(1)
+        end
       end
     end
 
