@@ -243,7 +243,7 @@ class Nothing
   #
   # @param m [Just<Proc>, Nothing] an instance of the Maybe type to apply
   # @return [Nothing] the result of applying the function wrapped in a Maybe
-  Contract MaybeOf[C::Any] => Nothing
+  Contract MaybeOf[Proc] => Nothing
   def ap(m)
     self
   end
@@ -382,12 +382,9 @@ class Just
   #
   # @param m [Just<Proc>, Nothing] an instance of the Maybe type to apply
   # @return [Just<Any>, Nothing] the result of applying the function wrapped in a Maybe
-  Contract MaybeOf[C::Any] => Maybe
+  Contract MaybeOf[Proc] => Maybe
   def ap(m)
-    unless @value.is_a? Proc
-      raise "Can't call #{__method__} unless `self` is a `Proc`"
-    end
-    m.map {|x| @value.curry[x]}
+    m.flat_map {|f| map(&f) }
   end
   alias apply ap
 
