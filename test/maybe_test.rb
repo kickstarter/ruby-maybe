@@ -61,6 +61,39 @@ class MaybeTest < Minitest::Test
     end
   end
 
+  context ".lift" do
+    setup do
+      @add = ->(x,y){ x + y }
+      @squared = ->(x){ x ** 2 }
+      @maybe_x = Maybe.Just(2)
+      @maybe_y = Maybe.Just(3)
+    end
+
+    context "with the wrong number of arguments" do
+      should "raise an error" do
+        assert_raises(ArgumentError) { Maybe.lift(@add, @maybe_x) }
+      end
+    end
+
+    context "with a single Just value" do
+      should "return an instance of Just" do
+        assert_equal Maybe.Just(9), Maybe.lift(@squared, @maybe_y)
+      end
+    end
+
+    context "with multiple Just values" do
+      should "return an instance of Just" do
+        assert_equal Maybe.Just(5), Maybe.lift(@add, @maybe_x, @maybe_y)
+      end
+    end
+
+    context "with a Nothing value" do
+      should "return an instance of Just" do
+        assert_equal Nothing.instance, Maybe.lift(@add, @maybe_x, Nothing.instance)
+      end
+    end
+  end
+
   context "Nothing" do
     subject do
       Nothing.instance
