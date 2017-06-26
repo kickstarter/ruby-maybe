@@ -4,7 +4,7 @@ Gem::Specification.new do |s|
   s.summary = 'A library providing the optional type \'Maybe\''
   s.authors = ['Ryan Closner', 'Corey Farwell']
   s.email = 'eng@kickstarter.com'
-  s.files = `git ls-files`.split('\n')
+  s.files = `git ls-files`.split("\n")
   s.homepage = 'http://github.com/kickstarter/ruby-maybe'
   s.license = 'Apache-2.0'
 
