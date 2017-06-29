@@ -129,11 +129,52 @@ module Maybe
   # @return [Just<Any>,Nothing] either a combined Just, or Nothing
   Contract C::Args[Maybe] => C::Or[Maybe]
   def self.zip(fst, snd, *rest)
-    [fst, snd, *rest].reduce(of([])) do |accum, maybe|
+    [fst, snd, *rest].reduce(Just([])) do |accum, maybe|
       accum.flat_map do |accum_|
         maybe.map {|maybe_| accum_ + [maybe_] }
       end
     end
+  end
+
+  # Takes a function and a set of Maybes, and attempts to apply the function
+  # and return the result wrapped in a Maybe.
+  #
+  # @example with a single instance of Just
+  #   Maybe.lift(->(n){ n ** 2 }, Maybe.Just(3))
+  #   #=> Just(9)
+  #
+  # @example with a single instance of Nothing
+  #   Maybe.lift(->(n){ n ** 2 }, Maybe.Nothing)
+  #   #=> Nothing
+  #
+  # @example with multiple instances of Just
+  #   Maybe.lift(->(x,y){ x + y }, Maybe.Just(1), Maybe.Just(2))
+  #   #=> Just(3)
+  #
+  # @example with multiple instances of Nothing
+  #   Maybe.lift(->(x,y){ x + y }, Maybe.Nothing, Maybe.Nothing)
+  #   #=> Nothing
+  #
+  # @example a mixture of Just and Nothing instances
+  #   Maybe.lift(->(x,y,z) { x + y + z }, Maybe.Just(1), Maybe.Nothing, Maybe.Just(2))
+  #   #=> Nothing
+  #
+  # @example called with the wrong number of arguments
+  #   Maybe.lift(->(x,y) { x + y }, Maybe.Just(1))
+  #   #=> ArgumentError: wrong number of arguments (given 1, expected 2)
+  #
+  # @param f [Proc] a function
+  # @param m [Array<Just<Any>>, Array<Nothing>] a collection of Maybes
+  # @return [Just<Any>,Nothing] either the result wrapped in a Just, or Nothing
+  Contract Proc, C::Args[Maybe] => Maybe
+  def self.lift(f, fst, *rst)
+    [fst, *rst]
+      .reduce(Just([])) {|accum, maybe|
+        accum.flat_map {|accum_|
+          maybe.map {|maybe_| accum_ + [maybe_] }
+        }
+      }
+      .ap( Just(->(args){ f.call(*args) }) )
   end
 end
 
