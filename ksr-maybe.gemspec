@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'ksr-maybe'
-  s.version = '0.1.0'
+  s.version = '0.1.1'
   s.summary = 'A library providing the optional type \'Maybe\''
   s.authors = ['Ryan Closner', 'Corey Farwell']
   s.email = 'eng@kickstarter.com'
