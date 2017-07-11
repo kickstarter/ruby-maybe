@@ -51,7 +51,7 @@ This gem utilizes the ['contracts.ruby' gem][contracts], which adds dynamic type
 
 ## Licenses
 
-See [LICENSES.md](./LICENSES.md).
+See [LICENSE](./LICENSE) and [NOTICE](./NOTICE.md).
 
 [contracts]: http://egonschiele.github.io/contracts.ruby/
 [contracts-override]: https://github.com/egonSchiele/contracts.ruby/blob/master/TUTORIAL.md#failure-callbacks
